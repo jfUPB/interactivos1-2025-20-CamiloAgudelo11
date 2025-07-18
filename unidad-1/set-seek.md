@@ -30,5 +30,5 @@ Inputs: A y B, Shake y Send Love
 
 Outputs:  Cambio color del circulo (A-Rojo,B-Amarillo y Shake-Verde) y cambio de cara del microbit cuando se presiona Send Love 
 
-Proceso: Esel codigo que utilizamos en las paginas web p5.js y python.microbit
+Proceso: Es el codigo que utilizamos en las paginas web p5.js y python.microbit
 
