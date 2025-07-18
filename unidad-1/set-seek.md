@@ -20,4 +20,15 @@ Es una forma de crear ya sea imagenes, sonidos o estructuras por medio de reglas
 
 ¿Cómo podrías aplicar lo que has visto en tu perfil profesional?
 
-Lo podria utilizar para la creacion de contenido visual de manera creativa y personalizada de una forma aleatoria.
+Lo podria utilizar para la creacion de contenido visual de manera creativa y personalizada como animaciones, imagenes y dibujos de una forma aleatoria.
+
+### Actividad 03
+
+En este sistemas físico interactivo identifica los inputs, outputs y el proceso.
+
+Inputs: A y B, Shake y Send Love
+
+Outputs:  Cambio color del circulo (A-Rojo,B-Amarillo y Shake-Verde) y cambio de cara del microbit cuando se presiona Send Love 
+
+Proceso: Esel codigo que utilizamos en las paginas web p5.js y python.microbit
+
