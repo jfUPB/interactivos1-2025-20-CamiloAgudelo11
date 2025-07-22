@@ -18,7 +18,7 @@ Lo podria aplicar para animaciones en vivo, tambien me gustaria relacionarlo con
 
 El arte generativo es una forma de crear ya sea imagenes, sonidos o estructuras por medio de reglas o algoritmos aleatorios que son programados por las personas.
 
-El diseño generativo es un proceso donde la persona le da ciertas reglas y algoritmos y la computadora genera diversos resultados.
+El diseño generativo es un proceso donde la persona le da ciertas reglas o algoritmos, y la computadora genera diversos resultados.
 
 ¿Cómo podrías aplicar lo que has visto en tu perfil profesional?
 
