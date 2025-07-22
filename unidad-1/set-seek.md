@@ -6,7 +6,7 @@
 
 ¿Qué es un sistema físico interactivo?
 
-Es que por medio de un aparato electronico la persona muestra un efecto visual segun las acciones que realice.
+Es que por medio de un aparato electronico la persona muestra un efecto visual segun las acciones que realice o que tenga programados en la maquina.
 
 ¿Cómo podrías aplicar lo que has visto en tu perfil profesional?
 
@@ -31,4 +31,26 @@ Inputs: A y B, Shake y Send Love
 Outputs:  Cambio color del circulo (A-Rojo,B-Amarillo y Shake-Verde) y cambio de cara del microbit cuando se presiona Send Love 
 
 Proceso: Es el codigo que utilizamos en las paginas web p5.js y python.microbit
+
+### Actividad 04
+Enlace programa: https://editor.p5js.org/CamiloAgudelo11/sketches/uY_djWb6E
+
+Código del programa en p5.js:
+
+```javascript
+function setup() {
+  createCanvas(400, 400);
+  background(220);
+}
+
+function draw() {
+  fill(random(255), random(255), random(255));
+  ellipse(random(width), random(height), 30);
+}
+```
+
+Captura de pantalla resultado:
+
+<img width="497" height="494" alt="Captura de pantalla 2025-07-21 203333" src="https://github.com/user-attachments/assets/574df2e2-2356-4cf3-ab2a-73134e32ef9c" />
+
 
