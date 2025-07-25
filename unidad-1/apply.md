@@ -16,12 +16,12 @@ Outputs: Color del cuadro(Verde o Rojo) y texto del boton de desconectar y conec
 
 Escribe el enlace a tu programa en el editor de p5.js.
 
-https://editor.p5js.org/CamiloAgudelo11/sketches/FwlyIeqTw
+[Enlace a el código en p5.js](https://editor.p5js.org/CamiloAgudelo11/sketches/FwlyIeqTw)
 
 
 Copia el código de tu programa en la bitácora (recuerda insertarlo usando markdown y el lenguaje javascript).
 
-```javascript
+``` js
 let port;
 let x = 200;
 
@@ -52,7 +52,7 @@ function draw() {
 
 Copia el código del micro:bit en la bitácora (recuerda insertarlo usando markdown y el lenguaje python).
 
-```python
+``` py
 from microbit import *
 
 uart.init(baudrate=115200)
