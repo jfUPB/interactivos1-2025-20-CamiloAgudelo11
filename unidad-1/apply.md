@@ -37,9 +37,9 @@ function draw() {
   if (port.availableBytes() > 0) {
     let data = port.read(1);
     if (data == "A") {
-      x -= 5; // mover a la izquierda
+      x -= 5; 
     } else if (data == "B") {
-      x += 5; // mover a la derecha
+      x += 5; 
     }
   }
 
