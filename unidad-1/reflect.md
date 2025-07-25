@@ -55,7 +55,11 @@ Al inicio de la unidad te pregunté: “¿Este curso para qué me sirve?”. Des
 
 Los sistemas interactivos sirven para muchas circunstancias, pero especialmente nos permite crear de una manera aleatoria o tambien controlada mediante ciertos parametros distintos tipos de arte, animacion o cualquier visual.
 
+
 El tutorial de la Actividad 05 te llevó paso a paso. ¿Cómo te sentiste con ese método de aprendizaje? ¿Te dio seguridad o preferirías haberlo intentado por tu cuenta desde el principio?
 
 Me parecio muy bueno este metodo debido a que nos explica de una manera detallada cada paso, para ir aprendiendo poco a poco para despues crear nuestros propios sistemas. 
 
+### Actividad 08
+
+La unica diferencia que pude notar con el codigo de mi compañero es que el agrego la funcion de conectar y desconectar el micro bit en el lienzo, mientras que yo siempre lo mantengo activo.
