@@ -2,12 +2,12 @@
 
 ## Código
 
-[Enlace a la aplicación a modificar](https://editor.p5js.org/generative-design/sketches/P_2_3_2_01)
+[Enlace a la aplicación a modificar](https://editor.p5js.org/generative-design/sketches/P_2_0_02)
 
 Código a modificar:
 
 ``` js
-// P_2_3_2_01
+// P_2_0_02
 //
 // Generative Gestaltung – Creative Coding im Web
 // ISBN: 978-3-87439-902-9, First Edition, Hermann Schmidt, Mainz, 2018
@@ -27,85 +27,46 @@ Código a modificar:
 // limitations under the License.
 
 /**
- * draw tool. shows how to work with relations between elements.
+ * drawing with a changing shape by draging the mouse.
  *
  * MOUSE
+ * position x          : length
+ * position y          : thickness and number of lines
  * drag                : draw
  *
  * KEYS
- * 1                   : draw mode 1 - fixed distance
- * 2                   : draw mode 2 - distance threshold
- * del, backspace      : clear screen
- * arrow up            : line length +
- * arrow down          : line length -
+ * del, backspace      : erase
  * s                   : save png
  */
 'use strict';
 
-var drawMode = 1;
-
-var col;
-var x = 0;
-var y = 0;
-var stepSize = 5.0;
-var lineLength = 25;
-
 function setup() {
-  // use full screen size
-  createCanvas(displayWidth, displayHeight);
+  createCanvas(720, 720);
+  noFill();
   background(255);
-  col = color(random(255), random(255), random(255), random(100));
-  x = mouseX;
-  y = mouseY;
-  cursor(CROSS);
+  strokeWeight(2);
+  stroke(0, 25);
 }
 
 function draw() {
   if (mouseIsPressed && mouseButton == LEFT) {
-    var d = dist(x, y, mouseX, mouseY);
+    push();
+    translate(width / 2, height / 2);
 
-    if (d > stepSize) {
-      var angle = atan2(mouseY - y, mouseX - x);
+    var circleResolution = int(map(mouseY + 100, 0, height, 2, 10));
+    var radius = mouseX - width / 2;
+    var angle = TAU / circleResolution;
 
-      push();
-      translate(x, y);
-      rotate(angle);
-      stroke(col);
-      if (frameCount % 2 == 0) stroke(150);
-      line(0, 0, 0, lineLength * random(0.95, 1) * d / 10);
-      pop();
-
-      if (drawMode == 1) {
-        x = x + cos(angle) * stepSize;
-        y = y + sin(angle) * stepSize;
-      } else {
-        x = mouseX;
-        y = mouseY;
-      }
+    beginShape();
+    for (var i = 0; i <= circleResolution; i++) {
+      var x = cos(angle * i) * radius;
+      var y = sin(angle * i) * radius;
+      vertex(x, y);
     }
+    endShape();
+
+    pop();
   }
-}
-
-function mousePressed() {
-  x = mouseX;
-  y = mouseY;
-  col = color(random(255), random(255), random(255), random(100));
-  // lineLength = random(15, 50);
-}
-
-function keyReleased() {
-  if (key == 's' || key == 'S') saveCanvas(gd.timestamp(), 'png');
-  if (keyCode == DELETE || keyCode == BACKSPACE) background(255);
-
-  if (key == '1') drawMode = 1;
-  if (key == '2') drawMode = 2;
-}
-
-function keyPressed() {
-  // lineLength ctrls arrowkeys up/down
-  if (keyCode == UP_ARROW) lineLength += 5;
-  if (keyCode == DOWN_ARROW) lineLength -= 5;
-}
 
 ```
 
@@ -114,160 +75,138 @@ function keyPressed() {
 Código modificado:
 
 ``` js
-let drawMode = 1;
-let col;
-let x = 0;
-let y = 0;
-let stepSize = 5.0;
-let lineLength = 25;
+
+let circleResolution;
+let radius;
+let angle;
+
+let port;
+let connectBtn;
+let connectionInitialized = false;
+let microBitConnected = false;
+
+let microBitX = 0;
+let microBitY = 0;
+let microBitAState = false;
+let microBitBState = false;
+let prevmicroBitAState = false;
+let prevmicroBitBState = false;
 
 
 const STATES = {
-  WAITING: "WAITING", // esperando conexión micro:bit
-  RUNNING: "RUNNING"  // micro:bit conectado
+  WAIT_MICROBIT_CONNECTION: "WAIT_MICROBIT_CONNECTION",
+  RUNNING: "RUNNING",
 };
-let appState = STATES.WAITING;
-
-let serial;
-let mbX = 0, mbY = 0, mbA = 0, mbB = 0;
-let microBitConnected = false;
+let appState = STATES.WAIT_MICROBIT_CONNECTION;
 
 function setup() {
-  createCanvas(displayWidth, displayHeight);
+  createCanvas(720, 720);
+  noFill();
   background(255);
-  col = color(random(255), random(255), random(255), random(100));
-  x = width / 2;
-  y = height / 2;
-  cursor(CROSS);
+  strokeWeight(2);
+  stroke(0, 25);
 
   
-  serial = new p5.WebSerial();
-  serial.getPorts();
-  serial.on("noport", makePortButton);
-  serial.on("portavailable", openPort);
-  serial.on("data", serialEvent);
+  port = createSerial();
+  connectBtn = createButton("Connect to micro:bit");
+  connectBtn.position(10, 10);
+  connectBtn.mousePressed(connectBtnClick);
 }
 
-function makePortButton() {
-  let button = createButton("Conectar Micro:bit");
-  button.mousePressed(() => serial.requestPort());
-}
-
-function openPort() {
-  serial.open();
-}
-
-function serialEvent() {
-  let inString = serial.readLine().trim();
-  if (!inString) return;
-
-  let values = inString.split(",");
-  if (values.length === 4) {
-    mbX = int(values[0]);
-    mbY = int(values[1]);
-    mbA = int(values[2]);
-    mbB = int(values[3]);
+function connectBtnClick() {
+  if (!port.opened()) {
+    port.open("MicroPython", 115200);
+    connectionInitialized = false;
+  } else {
+    port.close();
   }
 }
 
 function draw() {
-  
-  microBitConnected = serial.opened();
+ 
+  if (!port.opened()) {
+    connectBtn.html("Connect to micro:bit");
+    microBitConnected = false;
+  } else {
+    microBitConnected = true;
+    connectBtn.html("Disconnect");
 
+    if (port.opened() && !connectionInitialized) {
+      port.clear();
+      connectionInitialized = true;
+    }
+
+    if (port.availableBytes() > 0) {
+      let data = port.readUntil("\n");
+      if (data) {
+        data = data.trim();
+        let values = data.split(",");
+        if (values.length == 4) {
+          microBitX = int(values[0]);
+          microBitY = int(values[1]);
+          microBitAState = values[2].toLowerCase() === "true";
+          microBitBState = values[3].toLowerCase() === "true";
+          updateButtonStates(microBitAState, microBitBState);
+        }
+      }
+    }
+  }
+
+ 
   switch (appState) {
-    case STATES.WAITING:
-      if (microBitConnected) {
-        print("Micro:bit conectado");
-        noCursor();
+    case STATES.WAIT_MICROBIT_CONNECTION:
+      if (microBitConnected === true) {
+        print("Microbit listo para dibujar");
         appState = STATES.RUNNING;
       }
       break;
 
     case STATES.RUNNING:
-      if (!microBitConnected) {
-        print("Micro:bit desconectado");
-        cursor();
-        appState = STATES.WAITING;
-        break;
+      
+      if (microBitConnected === false) {
+        print("Esperando conexión de micro:bit");
+        appState = STATES.WAIT_MICROBIT_CONNECTION;
       }
 
       
-      let curX = map(mbX, -1024, 1024, 0, width);
-      let curY = map(mbY, -1024, 1024, 0, height);
+      if (microBitAState === true) {
+        push();
+        translate(width / 2, height / 2);
 
-     
-      if (mbB === 1) {
-        background(255);
+        // Usar acelerómetro para parámetros
+        circleResolution = int(map(microBitY, -1024, 1024, 2, 12));
+        radius = map(microBitX, -1024, 1024, -width/2, width/2);
+        angle = TAU / circleResolution;
+
+        beginShape();
+        for (let i = 0; i <= circleResolution; i++) {
+          let x = cos(angle * i) * radius;
+          let y = sin(angle * i) * radius;
+          vertex(x, y);
+        }
+        endShape();
+
+        pop();
       }
 
-     
-      if (mbA === 1) {
-        drawStroke(curX, curY);
-      } else {
-        x = curX;
-        y = curY;
-      }
       break;
   }
+}
 
- 
-  if (mouseIsPressed && mouseButton === LEFT) {
-    drawStroke(mouseX, mouseY);
+function updateButtonStates(newAState, newBState) {
+
+  if (newBState === true && prevmicroBitBState === false) {
+    background(255);
+    print("Pantalla limpiada con botón B");
   }
+
+  prevmicroBitAState = newAState;
+  prevmicroBitBState = newBState;
 }
 
-function drawStroke(targetX, targetY) {
-  let d = dist(x, y, targetX, targetY);
-  if (d > stepSize) {
-    let angle = atan2(targetY - y, targetX - x);
-
-    push();
-    translate(x, y);
-    rotate(angle);
-    stroke(col);
-    if (frameCount % 2 === 0) stroke(150);
-    line(0, 0, 0, lineLength * random(0.95, 1) * d / 10);
-    pop();
-
-    if (drawMode == 1) {
-      x = x + cos(angle) * stepSize;
-      y = y + sin(angle) * stepSize;
-    } else {
-      x = targetX;
-      y = targetY;
-    }
-  }
-}
-
-function mousePressed() {
-  x = mouseX;
-  y = mouseY;
-  col = color(random(255), random(255), random(255), random(100));
-}
 
 function keyReleased() {
-  if (key == 's' || key == 'S') saveCanvas(timestamp(), 'png');
-  if (keyCode == DELETE || keyCode == BACKSPACE) background(255);
-
-  if (key == '1') drawMode = 1;
-  if (key == '2') drawMode = 2;
-}
-
-function keyPressed() {
-  if (keyCode == UP_ARROW) lineLength += 5;
-  if (keyCode == DOWN_ARROW) lineLength -= 5;
-}
-
-function timestamp() {
-  return (
-    year() +
-    nf(month(), 2) +
-    nf(day(), 2) +
-    "_" +
-    nf(hour(), 2) +
-    nf(minute(), 2) +
-    nf(second(), 2)
-  );
+  if (key == 's' || key == 'S') saveCanvas('microbit_dibujo', 'png');
 }
 
 
@@ -276,6 +215,7 @@ function timestamp() {
 ## Video
 
 [Video demostratativo](URL)
+
 
 
 
