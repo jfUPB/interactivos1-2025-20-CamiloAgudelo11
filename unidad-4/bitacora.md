@@ -122,8 +122,17 @@ let stepSize = 5.0;
 let lineLength = 25;
 
 
+const STATES = {
+  WAIT_MICROBIT_CONNECTION: "WAIT_MICROBIT_CONNECTION",
+  RUNNING: "RUNNING",
+};
+let appState = STATES.WAIT_MICROBIT_CONNECTION;
+
+
 let serial;
 let mbX = 0, mbY = 0, mbA = 0, mbB = 0;
+let microBitConnected = false;
+let connectionInitialized = false;
 
 function setup() {
   createCanvas(displayWidth, displayHeight);
@@ -133,7 +142,7 @@ function setup() {
   y = height / 2;
   cursor(CROSS);
 
-  
+
   serial = new p5.WebSerial();
   serial.getPorts();
   serial.on("noport", makePortButton);
@@ -164,46 +173,70 @@ function serialEvent() {
 }
 
 function draw() {
-  
-  if (mbB === 1) {
-    background(255);
-  }
-
-  // convertir acelerómetro a posición en pantalla
-  let curX = map(mbX, -1024, 1024, 0, width);
-  let curY = map(mbY, -1024, 1024, 0, height);
-
  
-  if (mbA === 1) {
-    let d = dist(x, y, curX, curY);
-    if (d > stepSize) {
-      let angle = atan2(curY - y, curX - x);
+  microBitConnected = serial.opened();
 
-      push();
-      translate(x, y);
-      rotate(angle);
-      stroke(col);
-      if (frameCount % 2 == 0) stroke(150);
-      line(0, 0, 0, lineLength * random(0.95, 1) * d / 10);
-      pop();
+  switch (appState) {
+    case STATES.WAIT_MICROBIT_CONNECTION:
+      if (microBitConnected) {
+        print("Micro:bit listo para dibujar");
+        strokeWeight(0.75);
+        noCursor();
+        appState = STATES.RUNNING;
+      }
+      break;
 
-      if (drawMode == 1) {
-        x = x + cos(angle) * stepSize;
-        y = y + sin(angle) * stepSize;
+    case STATES.RUNNING:
+      if (!microBitConnected) {
+        print("Esperando conexión del micro:bit...");
+        cursor();
+        appState = STATES.WAIT_MICROBIT_CONNECTION;
+        break;
+      }
+
+     
+      let curX = map(mbX, -1024, 1024, 0, width);
+      let curY = map(mbY, -1024, 1024, 0, height);
+
+      
+      if (mbB === 1) {
+        background(255);
+      }
+
+  
+      if (mbA === 1) {
+        let d = dist(x, y, curX, curY);
+        if (d > stepSize) {
+          let angle = atan2(curY - y, curX - x);
+
+          push();
+          translate(x, y);
+          rotate(angle);
+          stroke(col);
+          if (frameCount % 2 == 0) stroke(150);
+          line(0, 0, 0, lineLength * random(0.95, 1) * d / 10);
+          pop();
+
+          if (drawMode == 1) {
+            x = x + cos(angle) * stepSize;
+            y = y + sin(angle) * stepSize;
+          } else {
+            x = curX;
+            y = curY;
+          }
+        }
       } else {
+        
         x = curX;
         y = curY;
       }
-    }
-  } else {
-    
-    x = curX;
-    y = curY;
+      break;
   }
 }
 
+
 function keyReleased() {
-  if (key == 's' || key == 'S') saveCanvas(gd.timestamp(), 'png');
+  if (key == 's' || key == 'S') saveCanvas(timestamp(), 'png');
   if (keyCode == DELETE || keyCode == BACKSPACE) background(255);
 
   if (key == '1') drawMode = 1;
@@ -214,11 +247,26 @@ function keyPressed() {
   if (keyCode == UP_ARROW) lineLength += 5;
   if (keyCode == DOWN_ARROW) lineLength -= 5;
 }
+
+
+function timestamp() {
+  return (
+    year() +
+    nf(month(), 2) +
+    nf(day(), 2) +
+    "_" +
+    nf(hour(), 2) +
+    nf(minute(), 2) +
+    nf(second(), 2)
+  );
+}
+
 ```
 
 ## Video
 
 [Video demostratativo](URL)
+
 
 
 
