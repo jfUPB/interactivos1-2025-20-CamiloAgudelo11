@@ -109,16 +109,116 @@ function keyPressed() {
 
 ```
 
-[Enlace a la aplicación modificada](URL)
+[Enlace a la aplicación modificada](https://editor.p5js.org/CamiloAgudelo11/sketches/BtjMVGZXd)
 
 Código modificado:
 
 ``` js
+let drawMode = 1;
+let col;
+let x = 0;
+let y = 0;
+let stepSize = 5.0;
+let lineLength = 25;
 
+
+let serial;
+let mbX = 0, mbY = 0, mbA = 0, mbB = 0;
+
+function setup() {
+  createCanvas(displayWidth, displayHeight);
+  background(255);
+  col = color(random(255), random(255), random(255), random(100));
+  x = width / 2;
+  y = height / 2;
+  cursor(CROSS);
+
+  
+  serial = new p5.WebSerial();
+  serial.getPorts();
+  serial.on("noport", makePortButton);
+  serial.on("portavailable", openPort);
+  serial.on("data", serialEvent);
+}
+
+function makePortButton() {
+  let button = createButton("Conectar Micro:bit");
+  button.mousePressed(() => serial.requestPort());
+}
+
+function openPort() {
+  serial.open();
+}
+
+function serialEvent() {
+  let inString = serial.readLine().trim();
+  if (!inString) return;
+
+  let values = inString.split(",");
+  if (values.length === 4) {
+    mbX = int(values[0]);
+    mbY = int(values[1]);
+    mbA = int(values[2]);
+    mbB = int(values[3]);
+  }
+}
+
+function draw() {
+  
+  if (mbB === 1) {
+    background(255);
+  }
+
+  // convertir acelerómetro a posición en pantalla
+  let curX = map(mbX, -1024, 1024, 0, width);
+  let curY = map(mbY, -1024, 1024, 0, height);
+
+ 
+  if (mbA === 1) {
+    let d = dist(x, y, curX, curY);
+    if (d > stepSize) {
+      let angle = atan2(curY - y, curX - x);
+
+      push();
+      translate(x, y);
+      rotate(angle);
+      stroke(col);
+      if (frameCount % 2 == 0) stroke(150);
+      line(0, 0, 0, lineLength * random(0.95, 1) * d / 10);
+      pop();
+
+      if (drawMode == 1) {
+        x = x + cos(angle) * stepSize;
+        y = y + sin(angle) * stepSize;
+      } else {
+        x = curX;
+        y = curY;
+      }
+    }
+  } else {
+    
+    x = curX;
+    y = curY;
+  }
+}
+
+function keyReleased() {
+  if (key == 's' || key == 'S') saveCanvas(gd.timestamp(), 'png');
+  if (keyCode == DELETE || keyCode == BACKSPACE) background(255);
+
+  if (key == '1') drawMode = 1;
+  if (key == '2') drawMode = 2;
+}
+
+function keyPressed() {
+  if (keyCode == UP_ARROW) lineLength += 5;
+  if (keyCode == DOWN_ARROW) lineLength -= 5;
+}
 ```
 
 ## Video
 
 [Video demostratativo](URL)
+
 
 
