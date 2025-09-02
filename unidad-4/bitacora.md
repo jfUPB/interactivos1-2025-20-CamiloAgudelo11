@@ -123,16 +123,14 @@ let lineLength = 25;
 
 
 const STATES = {
-  WAIT_MICROBIT_CONNECTION: "WAIT_MICROBIT_CONNECTION",
-  RUNNING: "RUNNING",
+  WAITING: "WAITING", // esperando conexión micro:bit
+  RUNNING: "RUNNING"  // micro:bit conectado
 };
-let appState = STATES.WAIT_MICROBIT_CONNECTION;
-
+let appState = STATES.WAITING;
 
 let serial;
 let mbX = 0, mbY = 0, mbA = 0, mbB = 0;
 let microBitConnected = false;
-let connectionInitialized = false;
 
 function setup() {
   createCanvas(displayWidth, displayHeight);
@@ -142,7 +140,7 @@ function setup() {
   y = height / 2;
   cursor(CROSS);
 
-
+  
   serial = new p5.WebSerial();
   serial.getPorts();
   serial.on("noport", makePortButton);
@@ -173,14 +171,13 @@ function serialEvent() {
 }
 
 function draw() {
- 
+  
   microBitConnected = serial.opened();
 
   switch (appState) {
-    case STATES.WAIT_MICROBIT_CONNECTION:
+    case STATES.WAITING:
       if (microBitConnected) {
-        print("Micro:bit listo para dibujar");
-        strokeWeight(0.75);
+        print("Micro:bit conectado");
         noCursor();
         appState = STATES.RUNNING;
       }
@@ -188,52 +185,65 @@ function draw() {
 
     case STATES.RUNNING:
       if (!microBitConnected) {
-        print("Esperando conexión del micro:bit...");
+        print("Micro:bit desconectado");
         cursor();
-        appState = STATES.WAIT_MICROBIT_CONNECTION;
+        appState = STATES.WAITING;
         break;
       }
 
-     
+      
       let curX = map(mbX, -1024, 1024, 0, width);
       let curY = map(mbY, -1024, 1024, 0, height);
 
-      
+     
       if (mbB === 1) {
         background(255);
       }
 
-  
+     
       if (mbA === 1) {
-        let d = dist(x, y, curX, curY);
-        if (d > stepSize) {
-          let angle = atan2(curY - y, curX - x);
-
-          push();
-          translate(x, y);
-          rotate(angle);
-          stroke(col);
-          if (frameCount % 2 == 0) stroke(150);
-          line(0, 0, 0, lineLength * random(0.95, 1) * d / 10);
-          pop();
-
-          if (drawMode == 1) {
-            x = x + cos(angle) * stepSize;
-            y = y + sin(angle) * stepSize;
-          } else {
-            x = curX;
-            y = curY;
-          }
-        }
+        drawStroke(curX, curY);
       } else {
-        
         x = curX;
         y = curY;
       }
       break;
   }
+
+ 
+  if (mouseIsPressed && mouseButton === LEFT) {
+    drawStroke(mouseX, mouseY);
+  }
 }
 
+function drawStroke(targetX, targetY) {
+  let d = dist(x, y, targetX, targetY);
+  if (d > stepSize) {
+    let angle = atan2(targetY - y, targetX - x);
+
+    push();
+    translate(x, y);
+    rotate(angle);
+    stroke(col);
+    if (frameCount % 2 === 0) stroke(150);
+    line(0, 0, 0, lineLength * random(0.95, 1) * d / 10);
+    pop();
+
+    if (drawMode == 1) {
+      x = x + cos(angle) * stepSize;
+      y = y + sin(angle) * stepSize;
+    } else {
+      x = targetX;
+      y = targetY;
+    }
+  }
+}
+
+function mousePressed() {
+  x = mouseX;
+  y = mouseY;
+  col = color(random(255), random(255), random(255), random(100));
+}
 
 function keyReleased() {
   if (key == 's' || key == 'S') saveCanvas(timestamp(), 'png');
@@ -248,7 +258,6 @@ function keyPressed() {
   if (keyCode == DOWN_ARROW) lineLength -= 5;
 }
 
-
 function timestamp() {
   return (
     year() +
@@ -261,11 +270,13 @@ function timestamp() {
   );
 }
 
+
 ```
 
 ## Video
 
 [Video demostratativo](URL)
+
 
 
 
