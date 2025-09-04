@@ -67,6 +67,12 @@ function draw() {
 
     pop();
   }
+}
+
+function keyReleased() {
+  if (keyCode == DELETE || keyCode == BACKSPACE) background(255);
+  if (key == 's' || key == 'S') saveCanvas(gd.timestamp(), 'png');
+}
 
 ```
 
@@ -215,6 +221,7 @@ function keyReleased() {
 ## Video
 
 [Video demostratativo](https://youtu.be/MIH3XLjyV6s)
+
 
 
 
