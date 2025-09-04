@@ -173,7 +173,7 @@ function draw() {
         push();
         translate(width / 2, height / 2);
 
-        // Usar acelerómetro para parámetros
+        
         circleResolution = int(map(microBitY, -1024, 1024, 2, 12));
         radius = map(microBitX, -1024, 1024, -width/2, width/2);
         angle = TAU / circleResolution;
@@ -214,7 +214,8 @@ function keyReleased() {
 
 ## Video
 
-[Video demostratativo](URL)
+[Video demostratativo](https://youtu.be/MIH3XLjyV6s)
+
 
 
 
