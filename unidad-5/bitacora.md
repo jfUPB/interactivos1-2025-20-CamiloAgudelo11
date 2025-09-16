@@ -76,3 +76,13 @@ Captura el resultado del experimento. ¿Qué diferencias ves entre los datos en 
 ASCII: ocupa más espacio (ej. "500" = 3 bytes + coma + salto de línea).
 
 Binario: fijo en 6 bytes → más eficiente y rápido para el receptor.
+
+### Actividad 03
+
+Explica por qué en la unidad anterior teníamos que enviar la información delimitada y además marcada con un salto de línea y ahora no es necesario.
+
+
+### Rubrica
+
+poner cada item y explicar el porque de la nota
+
