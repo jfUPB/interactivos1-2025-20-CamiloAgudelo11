@@ -13,7 +13,6 @@ Describe cómo se están comunicando el micro:bit y el sketch de p5.js. ¿Qué d
 ¿Cómo es la estructura del protocolo ASCII usado?
 
 - Línea por paquete, separada por comas y terminada en `\n`.  
-- Ejemplo: `-123,456,True,False\n`.
 
 Muestra y explica la parte del código de p5.js donde lee los datos del micro:bit y los transforma en coordenadas de la pantalla.
 
@@ -37,7 +36,6 @@ A pressed: newAState == true && prev == false.
 
 B released: newBState == false && prev == true.
 
-Capturas de pantalla de los algunos dibujos que hayas hecho con el sketch.
 
 
 ## Actividad 02
@@ -81,8 +79,23 @@ Binario: fijo en 6 bytes → más eficiente y rápido para el receptor.
 
 Explica por qué en la unidad anterior teníamos que enviar la información delimitada y además marcada con un salto de línea y ahora no es necesario.
 
+En ASCII, los mensajes varían de longitud , así que \n marca el fin. En binario, tamaño fijo (6 bytes), así que se lee exactamente eso.
+
+¿Qué ves en la consola? ¿Por qué crees que se produce este error?
+
+(Ejemplo: microBitY: 513 en vez de 524). Porque si lee en medio de un paquete, mezcla bytes de mensajes diferentes, dando valores erróneos.
+
+Agrega header (0xAA) y checksum. En consola: Valores correctos siempre (500,524,true,false). No hay errores de sincronización.
+
+
+¿Qué cambios tienen los programas y ¿Qué puedes observar en la consola del editor de p5.js?
+
+micro:bit agrega header y checksum. p5.js usa buffer para buscar 0xAA, verifica checksum. Consola: Datos estables, sin errores.
+
+### Actividad 04
 
 ### Rubrica
 
 poner cada item y explicar el porque de la nota
+
 
