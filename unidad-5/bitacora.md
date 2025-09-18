@@ -42,7 +42,7 @@ B released: newBState == false && prev == true.
 
 ¿Qué ventajas y desventajas ves en usar un formato binario en lugar de texto en ASCII?
 
-Binario: compacto, fijo, eficiente, pero ilegible y dependiente de endian.
+Binario: compacto, fijo, eficiente, pero depende de endian.
 
 
 ASCII: legible y fácil de depurar, pero ocupa más y es más lento.
@@ -73,7 +73,7 @@ Captura el resultado del experimento. ¿Qué diferencias ves entre los datos en 
 
 ASCII: ocupa más espacio (ej. "500" = 3 bytes + coma + salto de línea).
 
-Binario: fijo en 6 bytes → más eficiente y rápido para el receptor.
+Binario: fijo en 6 bytes → más eficiente y rápido.
 
 ### Actividad 03
 
@@ -83,9 +83,9 @@ En ASCII, los mensajes varían de longitud , así que \n marca el fin. En binari
 
 ¿Qué ves en la consola? ¿Por qué crees que se produce este error?
 
-(Ejemplo: microBitY: 513 en vez de 524). Porque si lee en medio de un paquete, mezcla bytes de mensajes diferentes, dando valores erróneos.
 
-Agrega header (0xAA) y checksum. En consola: Valores correctos siempre (500,524,true,false). No hay errores de sincronización.
+(Ejemplo: microBitY: 513 en vez de 524). Porque si lee en medio de un paquete, mezcla bytes de mensajes diferentes, dando un error.
+
 
 
 ¿Qué cambios tienen los programas y ¿Qué puedes observar en la consola del editor de p5.js?
@@ -98,74 +98,68 @@ Solucion: https://editor.p5js.org/CamiloAgudelo11/sketches/fGtALbNlG
 
 Proceso de construccion :
 
-Inicio: Tomé el código p5.js proporcionado (ASCII, dibuja círculos). Usé el código micro:bit dado (binario con header/checksum).
+Inicio: Tomé el código p5.js de la unidad anterior. Usé el código micro:bit dado.
 
 
-Prueba intermedia 1: Intenté leer datos binarios sin framing, usando port.readBytes(6). Error: Valores incorrectos (ej: microBitX=3073) por desalineación de paquetes. Solución: Implementé framing como en actividad 03, agregando serialBuffer, búsqueda de header (0xAA), y verificación de checksum.
+Prueba intermedia 1: Intenté leer datos binarios sin framing, usando port.readBytes(6) y me salio un error: Valores incorrectos. Solución: Implementé framing como en la actividad 03, agregando serialBuffer, búsqueda de header (0xAA), y verificación de checksum.
 
 
-Prueba intermedia 2: Añadí función readSerialData() basada en actividad 03. Error: Dibujo no aparecía correctamente. Solución: Verifiqué que microBitX y microBitY se usaran directamente en draw(), ya que el código original mapea estos valores para radius y circleResolution. Mantuve la lógica de dibujo intacta.
+Prueba intermedia 2: Añadí función readSerialData(). Error: Dibujo no aparecía correctamente. Solución: Verifiqué que microBitX y microBitY se usaran directamente en draw(), ya que el código original mapea estos valores para radius y circleResolution.
 
 
-Código final: Integré framing/checksum en readSerialData(). Eliminé connectionInitialized (no necesario con framing). Aseguré que updateButtonStates detecte el evento de presión de B para limpiar la pantalla. 
+Código final: Integré framing/checksum en readSerialData(). Y me asegure que updateButtonStates detecte el evento de presión de B para limpiar la pantalla. 
 
 Errores encontrados y soluciones:
 
-Error 1: Círculos no se dibujaban al presionar A. Solución: Confirmé que microBitAState se actualizaba en readSerialData. Evidencia: Código final, función readSerialData.
+Error 1: Círculos no se dibujaban al presionar A. Solución: Confirmé que microBitAState se actualizaba en readSerialData. 
 
 
-Error 2: Pantalla no se limpiaba con botón B. Solución: Verifiqué que updateButtonStates detectara cambio de false a true en microBitBState. Evidencia: Código final, función updateButtonStates.
-
-
-Error 3: Checksum fallaba ocasionalmente. Solución: Revisé cálculo en micro:bit (sum(data) % 256) y aseguré que p5.js comparara correctamente (dataBytes.reduce(...)). Evidencia: Proceso de construcción, prueba con SerialTerminal.
-
-
-Error 4: Desalineación tras reconexión. Solución: Framing (0xAA) y port.clear() en estado RUNNING aseguraron sincronización. Evidencia: Código final, estado RUNNING.
+Error 2: Pantalla no se limpiaba con botón B. Solución: Verifiqué que updateButtonStates detectara cambio de false a true en microBitBState. 
 
 
 
 Experimentos:
 
-Experimento 1: Moví micro:bit sin presionar – valores de microBitX/Y cambian en consola, pero no se dibuja (correcto, requiere A). Evidencia: Consola muestra valores como microBitX: 500, microBitY: 524.
+Experimento 1: Moví micro:bit sin presionar – valores de microBitX/Y cambian en consola, pero mo dibuja y es correcto debido a que se necesita presionar A.
 
 
-Experimento 2: Presioné A – dibuja círculos con resolución variable (basada en Y) y radio variable (basado en X). (Imagina captura: círculos concéntricos en canvas 720x720). Evidencia: Descripción en experimentos.
+Experimento 2: Presioné A – dibuja círculos con resolución variable (basada en Y) y radio variable (basado en X). 
 
 
-Experimento 3: Presioné B – limpia pantalla. Funciona al detectar cambio de false a true. Evidencia: Mensaje en consola “Pantalla limpiada con botón B”.
+Experimento 3: Presioné B – limpia pantalla. 
 
 
-Experimento 4: Desconecté/reconecté micro:bit – framing recupera sincronización rápidamente, sin valores erróneos. Evidencia: Consola muestra datos estables tras reconexión.
+Experimento 4: Desconecté/reconecté micro:bit – framing recupera sincronización rápidamente.
 
  
-Experimento 5: Comparé binario vs ASCII (usando código original). Binario: Menos lag, más eficiente (8 bytes vs 20+). Desventaja: Difícil depurar sin SerialTerminal. Evidencia: Comparación en experimentos.
 
 ### Rubrica
 
-1)Profundidad de la indagacion:4
+1)Profundidad de la indagacion:3.5
 
-Justificación: Formulé preguntas que exploran el diseño y sus implicaciones, como "¿Cómo se relacionan los bytes enviados con el formato '>2h2B'?" en la Actividad 02, y "¿Por qué el framing evita errores de sincronización?" en la Actividad 03. Esto va más allá de lo básico, cuestionando el impacto en la comunicación serial y proponiendo experimentos para validar ideas, lo que demuestra una curiosidad proactiva.
-
-
-Evidencias: En Actividad 01 (explicación del protocolo ASCII y eventos de botones); Actividad 02 (análisis de bytes en hex y comparación con ASCII); Actividad 03 (comparación de códigos y error de sincronización); Actividad 04 (proceso de construcción con pruebas intermedias)
-
-2)Calidad de la experimentacion:4 
-
-Justificación: Diseñé y ejecuté experimentos precisos y creativos, como cambiar el código para enviar datos fijos y verificar en la consola (Actividad 03), o probar variaciones del acelerómetro para dibujar círculos con diferentes resoluciones (Actividad 04). Incluí capturas y observaciones para validar hipótesis, como la integridad de los datos con checksum, mostrando un enfoque sistemático y no solo ejecución básica.
+Justificación: Aunque le di respuesta a la mayoria de preguntas que se propusieron, pude haber hecho una mayor indagacion o formular mas preguntas acerca de los temas que se trataron.
 
 
-Evidencias: En Actividad 02 (experimentos con shake y comparación ASCII/binario, con capturas en SerialTerminal); Actividad 03 (ejecución repetida para reproducir errores de sincronización y solución con framing); Actividad 04 (experimentos con movimiento del micro:bit, botón B y guardado de imagen, con screenshots antes/después).
+Evidencias: En todas las actividades respondi las preguntas que se formularon.
 
-3) Analisis y reflexion:3.8
+2)Calidad de la experimentacion:4
 
-Justificación: La bitácora demuestra una comprensión clara y profunda de la evidencia, con reflexiones sobre ventajas/desventajas (ej. binario es eficiente pero menos legible) y cómo el checksum asegura integridad. Analicé errores (ej. desalineación) y sus soluciones, conectando conceptos como framing con problemas reales, lo que refleja una reflexión madura.
-
-
-Evidencias: En Actividad 01 (análisis de estructura del protocolo y generación de eventos); Actividad 02 (reflexión sobre ventajas/desventajas de formatos y relación de bytes con código); Actividad 03 (análisis del error de sincronización y por qué no se necesita delimitador); Actividad 04 (reflexión sobre mejoras en eficiencia y depuración de errores).
+Justificación: Diseñe y probe distintos experimentos, como cambiando algunas partes del codigo de algunas actividades y ver que pasa, de igual manera pude haber hecho mas experimentos pero me enfoque especialmente en el codigo de la actividad 04 y pude haber hecho otros experimentos con los codigos anteriores.
 
 
-4) Apropiación y Articulación de Conceptos:4.5
+Evidencias: Actividad 04
 
-Justificación: Demostré una maestría analítica al aplicar conceptos como protocolo binario con framing en una aplicación completa, modificando el código para dibujar círculos interactivos y manejar eventos. Exploré el flujo de datos desde el micro:bit hasta p5.js, garantizando una comunicación fiable, y documenté el proceso con énfasis en conceptos clave como checksum y sincronización.
+3) Analisis y reflexion:3.4
 
-Evidencias: En Actividad 01 (repaso del caso ASCII); Actividad 02 (transformación a binario en micro:bit); Actividad 03 (adaptación en p5.js con DataView); Actividad 04 (aplicación final con código proporcionado, integrando todo para un sistema interactivo con círculos y limpieza de pantalla).
+Justificación: No se pusieron capturas de la terminal o logs de consola, ademas se resuelven los problemas pero de una manera superficial donde se podria indagar mas.
+
+
+Evidencias: En todas las actividades se evidencia la resolucion de distintos problemas.
+
+
+4) Apropiación y Articulación de Conceptos:4
+
+Justificación:  Aunque en algunos puntos de las actividades se da una respuesta sencilla, tambien se puede evidenciar que puse ejemplos que ayuda a respaldar la definicion.
+
+Evidencias: De la actividad 01 hasta la 03
+
