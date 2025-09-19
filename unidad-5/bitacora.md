@@ -149,7 +149,8 @@ Justificación: Diseñe y probe distintos experimentos, como cambiando algunas p
 
 Evidencias: Actividad 04
 
-3) Analisis y reflexion:3.4
+
+3)Analisis y reflexion:3.4
 
 Justificación: No se pusieron capturas de la terminal o logs de consola, ademas se resuelven los problemas pero de una manera superficial donde se podria indagar mas.
 
@@ -157,7 +158,7 @@ Justificación: No se pusieron capturas de la terminal o logs de consola, ademas
 Evidencias: En todas las actividades se evidencia la resolucion de distintos problemas.
 
 
-4) Apropiación y Articulación de Conceptos:4
+4)Apropiación y Articulación de Conceptos:4
 
 Justificación:  Aunque en algunos puntos de las actividades se da una respuesta sencilla, tambien se puede evidenciar que puse ejemplos que ayuda a respaldar la definicion.
 
@@ -165,4 +166,5 @@ Evidencias: De la actividad 01 hasta la 03
 
 
 Nota: 3.7
+
 
