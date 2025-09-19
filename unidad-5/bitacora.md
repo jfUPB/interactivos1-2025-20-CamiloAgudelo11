@@ -163,3 +163,6 @@ Justificación:  Aunque en algunos puntos de las actividades se da una respuesta
 
 Evidencias: De la actividad 01 hasta la 03
 
+
+Nota: 3.7
+
