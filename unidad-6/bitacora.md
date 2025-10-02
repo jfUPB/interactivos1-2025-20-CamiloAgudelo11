@@ -124,3 +124,101 @@ Es util ya que se utiliza un lenguaje para todo lo que facilita en todo aspecto 
 Resume con tus propias palabras la diferencia fundamental entre una comunicación HTTP tradicional y una comunicación usando WebSockets/Socket.IO. ¿En qué tipo de aplicaciones has visto o podrías imaginar que se usa esta comunicación en tiempo real?
 
 El HTTP es cuando la persona pide y el servidor responde, mientras que usando WebSockets es una conexion directa y que es continua donde ambos se pueden enviar mensajes en tiempo real. La he visto ya sea en juegos en linea o videollamadas
+
+
+## Acividad 03
+
+
+Cambia la primera ruta de /page1 a /pagina_uno.
+
+Inicia el servidor.
+
+Intenta acceder a http://localhost:3000/page1. ¿Funciona?
+
+
+No funciono
+
+
+Ahora intenta acceder a http://localhost:3000/pagina_uno. ¿Funciona?
+
+
+Si funciona
+
+¿Qué te dice esto sobre cómo el servidor asocia URLs con respuestas? Restaura el código.
+
+
+El servidor solo responde a la ruta especifica que se tenga definida 
+
+
+Asegúrate de que el servidor esté corriendo (npm start).
+
+Abre http://localhost:3000/page1 en una pestaña. Observa la terminal del servidor. ¿Qué mensaje ves? Anota el ID.
+
+
+Se mostro un ID unico en la terminal
+
+Abre http://localhost:3000/page2 en OTRA pestaña. Observa la terminal. ¿Qué mensaje ves? ¿El ID es diferente?
+
+
+Aparece otro ID unico diferente en al page1
+
+Cierra la pestaña de page1. Observa la terminal. ¿Qué mensaje ves? ¿Coincide el ID con el que anotaste?
+
+
+Se muestra un mensaje de User Disconected con el mismo ID que tenia en la pagina.
+
+Cierra la pestaña de page2. Observa la terminal.
+
+Aparece tambien lo mismo de la page1 con la diferencia que es el ID de page2
+
+
+Inicia el servidor y abre page1 y page2.
+
+Mueve la ventana de page1. Observa la terminal del servidor. ¿Qué evento se registra (win1update o win2update)? ¿Qué datos (Data:) ves?
+
+
+En la terminal mostro Received win1update 
+
+
+Mueve la ventana de page2. Observa la terminal. ¿Qué evento se registra ahora? ¿Qué datos ves?
+
+
+
+En la terminal mostro Received win2update 
+
+
+
+Experimento clave: cambia socket.broadcast.emit(‘getdata’, page1); por socket.emit(‘getdata’, page1); (quitando broadcast). Reinicia el servidor, abre ambas páginas. Mueve page1. ¿Se actualiza la visualización en page2? ¿Por qué sí o por qué no? (Pista: ¿A quién le envía el mensaje socket.emit?). Restaura el código a broadcast.emit.
+
+
+Los cambios solo se reciben en la misma pestaña y la otra pestaña no se actualiza.
+
+
+Detén el servidor.
+
+Cambia const port = 3000; a const port = 3001;.
+
+Inicia el servidor. ¿Qué mensaje ves en la consola? ¿En qué puerto dice que está escuchando?
+
+
+El servidor mostro  http://localhost:3001
+
+Intenta abrir http://localhost:3000/page1. ¿Funciona?
+
+
+No funciono.
+
+
+
+Intenta abrir http://localhost:3001/page1. ¿Funciona?
+
+
+Si funciona
+
+
+
+¿Qué aprendiste sobre la variable port y la función listen? Restaura el puerto a 3000.
+
+
+Si el puerto cambia tambien cambia la direccion que debo usar en el navegador.
+
