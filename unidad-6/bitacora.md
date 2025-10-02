@@ -222,3 +222,81 @@ Si funciona
 
 Si el puerto cambia tambien cambia la direccion que debo usar en el navegador.
 
+
+
+## Acividad 04
+
+
+Abre page2.html en tu navegador (con el servidor corriendo).
+
+Abre la consola de desarrollador (F12).
+
+Detén el servidor Node.js (Ctrl+C).
+
+Refresca la página page2.html. Observa la consola del navegador. ¿Ves algún error relacionado con la conexión? ¿Qué indica?
+
+
+En la consola aparecio un error de conexion WebSocket conection failed 
+
+
+
+Vuelve a iniciar el servidor y refresca la página. ¿Desaparecen los errores?
+
+
+Cuando volvi a iniciar el servidor y los errores desaparecieron lo que quiere dercir es que los clientes dependen de que el servidor este iniciado.
+
+
+Comenta la línea socket.emit(‘win2update’, currentPageData, socket.id); dentro del listener connect.
+
+Reinicia el servidor y refresca page1.html y page2.html.
+
+Mueve la ventana de page2 un poco para que envíe una actualización.
+
+¿Qué pasó? ¿Por qué?
+
+Lo que pso es que page1 no recibio actualizaciones ya que no se emite una actualizacion el servidor no envia nada a los otros clientes.
+
+
+
+Abre ambas páginas (es posible que ya las tengas abiertas).
+
+Mueve la ventana de page1. Observa la consola del navegador de page2. ¿Qué datos muestra?
+
+
+En la consola de page2 aparecieron los datos enviados.
+
+
+
+Mueve la ventana de page2. Observa la consola de page1. ¿Qué pasa? ¿Por qué?
+
+
+Pasa lo mismo que cuando movi la page1 que aparecen los datos en la otra ventana, ya que cada cliente recibe los datos de la posicion del otro ya que los datos se reenvian por el servidor 
+
+
+Observa checkWindowPosition() en page2.js y modifica el código del if para comprobar si el código dentreo de este se ejecuta.
+Mueve cada ventana y observa las consolas.
+¿Qué puedes concluir y por qué?
+
+
+En la consola se mostro que si entraba al if. Lo que se puede concluir es que checkWindowPosition() controla cuando envia actualizaciones, lo que evita enviar datos innecesarios.
+
+
+
+Cambia el background(220) para que dependa de la distancia entre las ventanas. Puedes calcular la magnitud del resultingVector usando let distancia = resultingVector.mag(); y luego usa map() para convertir esa distancia a un valor de gris o color. background(map(distancia, 0, 1000, 255, 0)); (ajusta el rango 0-1000 según sea necesario).
+
+Inventa otra modificación creativa.
+
+''
+js
+let distancia = resultingVector.mag();
+
+background(map(distancia, 0, 1000, 255, 0));
+
+let tamano = map(distancia, 0, 1000, 20, 200); 
+ellipse(width / 2, height / 2, tamano, tamano);
+''
+
+
+Hice que el tamaño de un  circulo en pantala dependa de la distancia.
+
+
