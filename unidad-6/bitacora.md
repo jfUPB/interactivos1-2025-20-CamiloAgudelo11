@@ -2,6 +2,34 @@
 # Evidencias de la unidad 6
 
 
+## Autoevaluacion 
+
+Actividad 01: 5.0
+
+
+Debido a que realice y comprendi la actividad propuesta ademas respondi de manera un tanto breve pero contundente a las preguntas formuladas.
+
+
+Actividad 02: 4.2
+
+Aunque respondi todas las preguntas en algunas me quede en lo superficial y no fui a mas investigacion, sin embargo conteste cada una de las preguntas.
+
+Actividad 03: 4.0
+
+Debido a que me enfoque mas en los experimentos no logre plasmar en mi bitacora cada una de las acciones o cosas que vi mientras los realizaba, pero de igual manera logre hacer cada experimento contestando cada pregunta.
+
+
+Actividad 04: 4.2
+
+Sucede lo mismo que en la actividad 03 me enfoque mas en la hora de hacer experimentos, pero en este caso si logre plasmar un poco mas, ademas de poner alguna parte de codigo para verificar lo que estoy realizando.
+
+Actividad 05: 5.0
+
+Realice toda la actividad propuesta, donde hice un nuevo programa utilizando el caso de estudio que es innovador y diferente al que ya tenia.
+
+## Nota:4.4
+
+
 ## Acividad 01
 
 ¿Qué ocurrió en la terminal cuando ejecutaste npm install? ¿Cuál crees que es su propósito?
@@ -300,3 +328,311 @@ ellipse(width / 2, height / 2, tamano, tamano);
 Hice que el tamaño de un  circulo en pantala dependa de la distancia.
 
 
+
+## Actividad 05
+
+Explica tu idea y realiza algunos bocetos.
+
+
+La idea es crear tipo chat sencillo de emojis donde en una pagina se utilicen botones para enviarle emojis a la otra pagina. Mientras que la otra pagina los envie con las teclas a la otra pagina.
+
+
+Implementa tu idea.
+Incluye todos los códigos (servidor y clientes) en tu bitácora.
+
+
+server.js
+```js
+const express = require('express');
+const http = require('http');
+const socketIO = require('socket.io');
+const path = require('path');
+const app = express();
+const server = http.createServer(app); 
+const io = socketIO(server); 
+const port = 3000;
+
+let page1 = { x: 0, y: 0, width: 100, height: 100 };
+let page2 = { x: 0, y: 0, width: 100, height: 100 };
+let connectedClients = new Map();
+let syncedClients = new Set();
+
+app.use(express.static(path.join(__dirname, 'views')));
+
+app.get('/page1', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'page1.html'));
+});
+
+app.get('/page2', (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'page2.html'));
+});
+
+io.on('connection', (socket) => {
+    console.log('A user connected - ID:', socket.id);
+    connectedClients.set(socket.id, { page: null, synced: false });
+    
+    socket.on('disconnect', () => {
+        console.log('User disconnected - ID:', socket.id);
+        connectedClients.delete(socket.id);
+        syncedClients.delete(socket.id);
+        socket.broadcast.emit('peerDisconnected');
+    });
+
+    socket.on('win1update', (window1, sendid) => {
+        console.log('Received win1update from ID:', socket.id, 'Data:', window1);
+        if (isValidWindowData(window1)) {
+            page1 = window1;
+            connectedClients.set(socket.id, { page: 'page1', synced: false });
+            socket.broadcast.emit('getdata', { data: page1, from: 'page1' });
+            checkAndNotifySyncStatus();
+        }
+    });
+
+    socket.on('win2update', (window2, sendid) => {
+        console.log('Received win2update from ID:', socket.id, 'Data:', window2);
+        if (isValidWindowData(window2)) {
+            page2 = window2;
+            connectedClients.set(socket.id, { page: 'page2', synced: false });
+            socket.broadcast.emit('getdata', { data: page2, from: 'page2' });
+            checkAndNotifySyncStatus();
+        }
+    });
+
+    socket.on('requestSync', () => {
+        const clientInfo = connectedClients.get(socket.id);
+        if (clientInfo?.page === 'page1') {
+            socket.emit('getdata', { data: page2, from: 'page2' });
+        } else if (clientInfo?.page === 'page2') {
+            socket.emit('getdata', { data: page1, from: 'page1' });
+        }
+    });
+
+    socket.on('confirmSync', () => {
+        syncedClients.add(socket.id);
+        const clientInfo = connectedClients.get(socket.id);
+        if (clientInfo) {
+            connectedClients.set(socket.id, { ...clientInfo, synced: true });
+        }
+        checkAndNotifySyncStatus();
+    });    
+
+    
+    socket.on("message", (emoji) => {
+        console.log("Emoji recibido:", emoji);
+        // Reenviar a todos los demás clientes
+        socket.broadcast.emit("message", emoji);
+    });
+});
+
+function isValidWindowData(data) {
+    return data && 
+           typeof data.x === 'number' && 
+           typeof data.y === 'number' && 
+           typeof data.width === 'number' && data.width > 0 &&
+           typeof data.height === 'number' && data.height > 0;
+}
+
+function checkAndNotifySyncStatus() {
+    const page1Clients = Array.from(connectedClients.entries()).filter(([id, info]) => info.page === 'page1');
+    const page2Clients = Array.from(connectedClients.entries()).filter(([id, info]) => info.page === 'page2');
+    
+    const bothPagesConnected = page1Clients.length > 0 && page2Clients.length > 0;
+    const allClientsSynced = Array.from(connectedClients.keys()).every(id => syncedClients.has(id));
+    const hasMinimumClients = connectedClients.size >= 2;
+
+    console.log(`Debug - Connected clients: ${connectedClients.size}, Page1: ${page1Clients.length}, Page2: ${page2Clients.length}, Synced: ${syncedClients.size}`);
+
+    if (bothPagesConnected && allClientsSynced && hasMinimumClients) {
+        io.emit('fullySynced', true);
+        console.log('All clients are fully synced');
+    } else {
+        io.emit('fullySynced', false);
+        console.log(`Sync status: pages=${bothPagesConnected}, synced=${allClientsSynced}, clients=${connectedClients.size}`);
+    }
+}
+
+server.listen(port, () => {
+    console.log(`Server is listening on http://localhost:${port}`);
+});
+
+```
+
+
+page1.html 
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Emoji Chat 1</title>
+  <style>
+    body { font-family: Arial; text-align: center; }
+    #messages { font-size: 2rem; margin-top: 20px; }
+    button { font-size: 2rem; margin: 10px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h2>Emoji Chat (User 1)</h2>
+  <button onclick="sendEmoji('😀')">😀</button>
+  <button onclick="sendEmoji('❤️')">❤️</button>
+  <button onclick="sendEmoji('🔥')">🔥</button>
+  <button onclick="sendEmoji('👀')">👀</button>
+  <button onclick="sendEmoji('🎶')">🎶</button>
+
+  <div id="messages"></div>
+
+ 
+  <script src="/socket.io/socket.io.js"></script>
+ 
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+
+
+  <script src="page1.js"></script>
+</body>
+</html>
+```
+
+
+page1.js
+
+```js
+(function () {
+  let socket = null;
+
+  function addEmoji(emoji) {
+    const messagesDiv = document.getElementById("messages");
+    if (!messagesDiv) {
+      console.error("No se encontró #messages en el DOM");
+      return;
+    }
+    const span = document.createElement("span");
+    span.textContent = emoji;
+    span.style.margin = "0 8px";
+    messagesDiv.appendChild(span);
+  }
+
+  function initSocket() {
+    try {
+      if (typeof io !== "function") {
+        console.error("io() no está disponible (socket.io cliente no cargado)");
+        return;
+      }
+      socket = io();
+
+      socket.on("connect", () => {
+        console.log("page1: socket conectado, id =", socket.id);
+      });
+      socket.on("disconnect", () => {
+        console.log("page1: socket desconectado");
+      });
+
+      socket.on("message", (emoji) => {
+        console.log("page1: mensaje recibido desde server:", emoji);
+        addEmoji(emoji);
+      });
+    } catch (err) {
+      console.error("page1: error inicializando socket:", err);
+      socket = null;
+    }
+  }
+
+
+  window.sendEmoji = function (emoji) {
+ 
+    addEmoji(emoji);
+
+    if (socket && socket.connected) {
+      console.log("page1: enviando emoji al servidor:", emoji);
+      socket.emit("message", emoji);
+    } else {
+      console.warn("page1: socket no conectado — no se pudo enviar al servidor");
+    }
+  };
+
+ 
+  window.addEventListener("load", () => {
+    console.log("page1: DOM cargado — intentando inicializar socket...");
+    initSocket();
+  });
+})();
+```
+
+page2.html
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Page 2 - Chat Emojis</title>
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.11.0/lib/p5.min.js"></script>
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+    }
+  </style>
+</head>
+<body>
+ 
+  <script src="page2.js"></script>
+</body>
+</html>
+```
+
+
+page2.js
+
+``` js
+let socket;
+let emojis = ["😀", "😂", "😍", "😎", "😡", "👍", "👎", "🔥", "🎉", "💀"];
+let messages = [];
+
+function setup() {
+  createCanvas(windowWidth, windowHeight);
+  textSize(64);
+  textAlign(CENTER, CENTER);
+
+  socket = io();
+
+  socket.on("message", (msg) => {
+    messages.push(msg);
+    if (messages.length > 10) messages.shift();
+  });
+}
+
+function draw() {
+  background(220);
+
+  for (let i = 0; i < messages.length; i++) {
+    text(messages[i], width / 2, 100 + i * 70);
+  }
+
+  fill(0);
+  textSize(24);
+  text("Presiona teclas 1-0 para enviar emojis", width / 2, height - 50);
+}
+
+function keyPressed() {
+  let index;
+  if (key >= '0' && key <= '9') {
+    index = int(key) - 1;
+    if (index === -1) index = 9; // si presiona 0 → último emoji
+    if (index >= 0 && index < emojis.length) {
+      let chosen = emojis[index];
+      socket.emit("message", chosen);
+
+      
+      messages.push(chosen);
+      if (messages.length > 10) messages.shift();
+    }
+  }
+}
+
+
+```
