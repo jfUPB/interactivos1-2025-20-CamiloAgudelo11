@@ -1,6 +1,32 @@
 
 # Evidencias de la unidad 7
 
+## Autoevaluacion nota:5.0
+
+Actividad 01: 5.0
+
+Realice todas las actividades propuestas ademas de dar evidencias de ellas.
+
+
+Actividad 02: 5.0
+
+Realice todas las preguntas.
+
+
+Actividad 03: 5.0
+
+
+Realice la actividad completa 
+
+Actividad 04: 5.0
+
+Realice el diagrama propuesto.
+
+
+Actividad 05: 5.0
+
+Realice el diseño e hice el codigo para que funcionara correctamente.
+
 ## Actividad 01 
 
 ¿Qué URL de Dev Tunnels obtuviste? ¿Por qué crees que necesitamos usar esta URL en lugar de http://localhost:3000 o la IP local de tu computador para que el celular se conecte?
@@ -403,3 +429,4 @@ function mousePressed() {
 ```
 
 Cancion usada: https://youtu.be/fo773EQdFC4?si=dQ4HA92pYCBC-YHE
+
